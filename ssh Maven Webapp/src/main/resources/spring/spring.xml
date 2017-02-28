@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans default-autowire="default"
+	xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+	<context:component-scan base-package="com.ll.ssh.spring"></context:component-scan>
+	
+
+	<!-- 引入数据库属性文件 -->
+	<context:property-placeholder location="classpath:config.properties" />	
+	<!-- 使用aspectJ注解的方式配置aop -->
+	<!-- <aop:aspectj-autoproxy></aop:aspectj-autoproxy> -->
+	<bean id="loggingAspect" class="com.ll.ssh.spring.aop.LoggingAspect"></bean>
+	
+	<aop:config><!-- execution(* com.cecep.service..*Impl.*(..)) -->
+		<aop:pointcut id="logPointCut" expression="execution(* com.ll.ssh.spring.service..*.*(..))" />
+		<aop:aspect ref="loggingAspect" id="logAspect">
+			<aop:after-returning method="afterReturn" pointcut-ref="logPointCut" returning="result"/>   
+		</aop:aspect> 
+	</aop:config>
+	
+	<!-- <bean id="transactionManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager"></bean>
+ -->
+	<!--声明式事务：注解方式
+	 <tx:annotation-driven transaction-manager="transactionManager"/> -->
+	<!-- 声明式事务，自动
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" />
+			<tx:method name="get*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<aop:pointcut expression="execution(* com.ll.ssh.spring..*.*(..))" id="txPointcut"/>
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+	</aop:config> -->
+</beans>
